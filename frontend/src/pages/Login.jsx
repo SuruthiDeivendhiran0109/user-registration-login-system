@@ -133,7 +133,11 @@ export default function Login() {
               <p className="font-semibold flex items-center gap-1.5 mb-1">
                 <AlertTriangle className="w-3.5 h-3.5" /> Spring Boot Server Offline
               </p>
-              <p>Start the backend: <code className="font-mono">mvn spring-boot:run</code> in the backend directory.</p>
+              {typeof window !== 'undefined' && window.location.hostname.endsWith('github.io') ? (
+                <p>This frontend is hosted as a static preview on GitHub Pages. To process live logins and connect to MySQL, the Spring Boot backend must be running on a publicly accessible server.</p>
+              ) : (
+                <p>Start the backend: <code className="font-mono">mvn spring-boot:run</code> in the backend directory.</p>
+              )}
             </div>
           )}
 

@@ -53,7 +53,8 @@ async function request(endpoint, options = {}) {
           try {
             data = JSON.parse(text);
           } catch {
-            data = { message: text };
+            // Never expose raw HTML response strings or static server error pages
+            data = null;
           }
         }
       } catch {
@@ -62,11 +63,31 @@ async function request(endpoint, options = {}) {
     }
 
     if (!response.ok) {
-      const errorMsg = data?.message || (
-        (response.status === 504 || response.status === 502 || response.status === 503)
-          ? 'Backend server is offline or unreachable at port 5000. Please start the Spring Boot application.'
-          : `Request failed with status ${response.status}`
-      );
+      let errorMsg = data?.message;
+
+      // When the server response is not JSON or lacks a clean message, produce an informative error
+      if (!errorMsg || typeof errorMsg !== 'string' || errorMsg.trim().startsWith('<')) {
+        const isGithubPages = typeof window !== 'undefined' && window.location.hostname.endsWith('github.io');
+
+        if (response.status === 405) {
+          errorMsg = isGithubPages
+            ? 'Backend API Unavailable: GitHub Pages is a static file host and does not process backend API requests (HTTP 405). The Java Spring Boot backend and MySQL database must be hosted on an online server for live authentication.'
+            : 'HTTP 405 Method Not Allowed: The requested endpoint does not support this HTTP method.';
+        } else if (response.status === 404) {
+          errorMsg = isGithubPages
+            ? 'Backend API Endpoint Not Found (404): The frontend is running on static GitHub Pages without an active backend connection.'
+            : 'The requested API endpoint was not found on the server (404).';
+        } else if (response.status === 502 || response.status === 503 || response.status === 504) {
+          errorMsg = 'Backend server is offline or unreachable. Please verify that the Spring Boot application is running.';
+        } else if (response.status === 401) {
+          errorMsg = 'Invalid email or password. Please verify your credentials.';
+        } else if (response.status === 403) {
+          errorMsg = 'Access denied. You do not have permission to perform this action.';
+        } else {
+          errorMsg = `Request failed with status ${response.status}. Please check your connection.`;
+        }
+      }
+
       const err = new Error(errorMsg);
       err.status = response.status;
       err.fieldErrors = data?.fieldErrors || null;
@@ -76,13 +97,19 @@ async function request(endpoint, options = {}) {
     return { success: true, data: data || {} };
   } catch (error) {
     const msg = error.message || '';
-    if (msg.includes('Failed to fetch') || msg.includes('Unexpected end of JSON')) {
+    const isGithubPages = typeof window !== 'undefined' && window.location.hostname.endsWith('github.io');
+
+    if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Unexpected end of JSON')) {
+      const netMsg = isGithubPages
+        ? 'Cannot connect to backend server: GitHub Pages is hosting the static frontend only. A publicly accessible Spring Boot backend is required for live registration and login.'
+        : 'Backend server is offline or unreachable. Please ensure the Spring Boot server is running on port 5000.';
       return {
         success: false,
         status: 503,
-        error: 'Backend server is offline or unreachable at port 5000. Please ensure the Spring Boot server is running.'
+        error: netMsg
       };
     }
+
     return {
       success: false,
       status: error.status || 500,
