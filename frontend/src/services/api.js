@@ -1,7 +1,6 @@
 // Centralized API client for communicating with Spring Boot REST API
-// Uses session cookies (credentials: 'include') and CSRF protection (X-XSRF-TOKEN)
-
-const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const rawBase = import.meta.env.VITE_API_URL || '/api';
+const BASE_URL = rawBase.endsWith('/') ? rawBase.slice(0, -1) : rawBase;
 
 /**
  * Extract CSRF token from document.cookie if present
