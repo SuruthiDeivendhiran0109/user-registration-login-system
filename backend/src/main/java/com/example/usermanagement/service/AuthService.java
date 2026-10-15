@@ -158,11 +158,15 @@ public class AuthService {
         String tokenHash = hashToken(rawToken);
         LocalDateTime expiry = LocalDateTime.now().plusMinutes(RESET_TOKEN_EXPIRATION_MINUTES);
 
-        PasswordResetToken resetToken = new PasswordResetToken(tokenHash, user, expiry);
+        PasswordResetToken resetToken = new PasswordResetToken(rawToken, tokenHash, user, expiry);
         tokenRepository.save(resetToken);
 
-        // Send reset link to the user
-        String resetLink = frontendUrl + "/reset-password?token=" + rawToken;
+        // Send reset link using clean production frontend URL fallback
+        String base = (frontendUrl != null ? frontendUrl.trim() : "").replaceAll("/+$", "");
+        if (base.isEmpty() || base.contains("localhost")) {
+            base = "https://suruthideivendhiran0109.github.io/user-registration-login-system";
+        }
+        String resetLink = base + "/reset-password?token=" + rawToken;
         emailService.sendPasswordResetEmail(user.getEmail(), resetLink);
 
         return resetLink;
@@ -179,7 +183,7 @@ public class AuthService {
         String rawToken = request.getToken().trim();
         String tokenHash = hashToken(rawToken);
 
-        PasswordResetToken resetToken = tokenRepository.findByTokenHash(tokenHash)
+        PasswordResetToken resetToken = tokenRepository.findByTokenHashOrToken(tokenHash, rawToken)
             .orElseThrow(() -> new IllegalArgumentException("Invalid or expired password reset link."));
 
         if (resetToken.isUsed()) {

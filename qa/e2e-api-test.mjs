@@ -138,6 +138,8 @@ async function main() {
   const negatives = [
     ['Empty JSON object', {}, 400, r => ['firstName', 'lastName', 'dateOfBirth', 'address', 'phoneNumber', 'email', 'password', 'confirmPassword'].every(k => r.json?.fieldErrors?.[k])],
     ['Whitespace-only fields', { ...userA, email: negEmail('ws'), firstName: '   ', lastName: '  ', address: '     ', phoneNumber: '   ' }, 400, r => r.json?.fieldErrors?.firstName && r.json?.fieldErrors?.address],
+    ['First name starts with lowercase "arun"', { ...userA, email: negEmail('fn1'), firstName: 'arun' }, 400, r => r.json?.fieldErrors?.firstName],
+    ['First name starts with digit "1Arun"', { ...userA, email: negEmail('fn2'), firstName: '1Arun' }, 400, r => r.json?.fieldErrors?.firstName],
     ['Invalid email "not-an-email"', { ...userA, email: 'not-an-email' }, 400, r => r.json?.fieldErrors?.email],
     ['Invalid email without TLD "qa@localhost"', { ...userA, email: `qa${RUN}@localhost` }, 400, r => r.json?.fieldErrors?.email],
     ['Invalid phone "abcdefghij"', { ...userA, email: negEmail('ph1'), phoneNumber: 'abcdefghij' }, 400, r => r.json?.fieldErrors?.phoneNumber],
@@ -304,7 +306,70 @@ async function main() {
   const relog = new Client(); await relog.csrf();
   const relogRes = await login(relog, { email: userA.email, password: PW_A });
   record('Logout', 'User can log in again after logout', relogRes.status === 200);
-  await relog.req('POST', '/api/auth/logout', { csrf: true });
+  /* ===== Phase 7: password reset ===== */
+  const forgotClient = new Client();
+  await forgotClient.csrf();
+  const forgotRes = await forgotClient.req('POST', '/api/auth/forgot-password', {
+    body: { email: userA.email }, csrf: true,
+  });
+  record('ForgotPassword', 'POST /api/auth/forgot-password returns 200', forgotRes.status === 200 && forgotRes.json?.success === true, `status=${forgotRes.status}`);
+
+  // Fetch reset token from DB
+  const userIdA = sql(`SELECT id FROM users WHERE email='${esc(userA.email)}'`)[0][0];
+  const tokenRows = sql(`SELECT id, token, token_hash, user_id, used FROM password_reset_tokens WHERE user_id=${userIdA} ORDER BY id DESC LIMIT 1`);
+  record('ForgotPassword', 'Reset token record persisted in database', tokenRows.length === 1 && String(tokenRows[0][3]) === String(userIdA));
+
+  // Determine token string from devResetLink or DB token
+  let resetTokenStr = '';
+  if (forgotRes.json?.devResetLink) {
+    const m = forgotRes.json.devResetLink.match(/token=([^&]+)/);
+    if (m) resetTokenStr = m[1];
+  }
+  if (!resetTokenStr && tokenRows.length && tokenRows[0][1]) {
+    resetTokenStr = tokenRows[0][1];
+  }
+
+  // Negative: invalid token
+  const badTokenRes = await forgotClient.req('POST', '/api/auth/reset-password', {
+    body: { token: 'invalid-nonexistent-token', newPassword: 'NewPassword@123', confirmPassword: 'NewPassword@123' }, csrf: true,
+  });
+  record('ResetPassword', 'Invalid reset token rejected -> 400', badTokenRes.status === 400, `status=${badTokenRes.status}`);
+
+  // Negative: mismatched confirm password
+  if (resetTokenStr) {
+    const mismatchRes = await forgotClient.req('POST', '/api/auth/reset-password', {
+      body: { token: resetTokenStr, newPassword: 'NewPassword@123', confirmPassword: 'DifferentPassword@123' }, csrf: true,
+    });
+    record('ResetPassword', 'Mismatched confirm password rejected -> 400', mismatchRes.status === 400, `status=${mismatchRes.status}`);
+
+    // Positive: successful reset password
+    const NEW_PW = `Pz9#${RUN}New!`;
+    const resetOk = await forgotClient.req('POST', '/api/auth/reset-password', {
+      body: { token: resetTokenStr, newPassword: NEW_PW, confirmPassword: NEW_PW }, csrf: true,
+    });
+    record('ResetPassword', 'Valid password reset -> 200', resetOk.status === 200 && resetOk.json?.success === true, `status=${resetOk.status}`);
+
+    // Verify token is now marked used
+    const tokenUsed = sql(`SELECT used FROM password_reset_tokens WHERE id=${tokenRows[0][0]}`)[0][0];
+    record('ResetPassword', 'Token marked used in database', tokenUsed === '1' || tokenUsed === '\x01' || tokenUsed?.charCodeAt(0) === 1);
+
+    // Negative: reuse consumed token
+    const reuseRes = await forgotClient.req('POST', '/api/auth/reset-password', {
+      body: { token: resetTokenStr, newPassword: 'AnotherPassword@123', confirmPassword: 'AnotherPassword@123' }, csrf: true,
+    });
+    record('ResetPassword', 'Reusing consumed token rejected -> 400', reuseRes.status === 400, `status=${reuseRes.status}`);
+
+    // Verify old password no longer works
+    const oldLogin = new Client(); await oldLogin.csrf();
+    const oldLoginRes = await login(oldLogin, { email: userA.email, password: PW_A });
+    record('ResetPassword', 'Old password rejected after reset (401)', oldLoginRes.status === 401);
+
+    // Verify new password works
+    const newLogin = new Client(); await newLogin.csrf();
+    const newLoginRes = await login(newLogin, { email: userA.email, password: NEW_PW });
+    record('ResetPassword', 'Login with new password succeeds (200)', newLoginRes.status === 200 && newLoginRes.json?.user?.email === userA.email);
+    await newLogin.req('POST', '/api/auth/logout', { csrf: true });
+  }
 
   /* ===== Through the Vite proxy (what the browser actually uses) ===== */
   try {

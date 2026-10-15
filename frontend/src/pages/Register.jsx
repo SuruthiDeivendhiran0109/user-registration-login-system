@@ -27,10 +27,14 @@ function calcStrength(pass) {
 
 function validateField(name, value, all) {
   switch (name) {
-    case 'firstName':
-      if (!value.trim()) return 'First name is required.';
-      if (value.trim().length < 2) return 'At least 2 characters.';
+    case 'firstName': {
+      const trimmed = (value || '').trim();
+      if (!trimmed) return 'First name is required.';
+      if (trimmed.length < 2) return 'At least 2 characters.';
+      if (!/^[A-Z]/.test(trimmed)) return 'First name must start with an uppercase letter (A-Z).';
+      if (!/^[A-Za-z\s'-]+$/.test(trimmed)) return 'First name must contain only letters, spaces, hyphens, or apostrophes.';
       break;
+    }
     case 'lastName':
       if (!value.trim()) return 'Last name is required.';
       if (value.trim().length < 2) return 'At least 2 characters.';

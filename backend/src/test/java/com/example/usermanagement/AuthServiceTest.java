@@ -188,12 +188,12 @@ class AuthServiceTest {
     @Test
     @DisplayName("Should successfully reset password and mark token as used")
     void testResetPassword_Success() {
-        User user = new User("Jane", "Doe", LocalDate.of(1995, 5, 20), "123 Maple", "+1555", "jane.doe@example.com", "$2a$10$old");
+        User user = new User("Jane", "Doe", LocalDate.of(1995, 5, 20), "123 Maple", "9876543210", "jane.doe@example.com", "$2a$10$old");
         com.example.usermanagement.entity.PasswordResetToken token = new com.example.usermanagement.entity.PasswordResetToken(
-            AuthService.hashToken("valid-token"), user, java.time.LocalDateTime.now().plusMinutes(10)
+            "valid-token", AuthService.hashToken("valid-token"), user, java.time.LocalDateTime.now().plusMinutes(10)
         );
 
-        when(tokenRepository.findByTokenHash(AuthService.hashToken("valid-token"))).thenReturn(Optional.of(token));
+        when(tokenRepository.findByTokenHashOrToken(AuthService.hashToken("valid-token"), "valid-token")).thenReturn(Optional.of(token));
         when(passwordEncoder.encode("NewSecurePassword@123")).thenReturn("$2a$10$newHashed");
 
         com.example.usermanagement.dto.ResetPasswordRequest request = new com.example.usermanagement.dto.ResetPasswordRequest();

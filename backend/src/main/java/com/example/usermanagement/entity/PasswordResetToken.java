@@ -17,7 +17,10 @@ public class PasswordResetToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "token_hash", nullable = false, length = 64)
+    @Column(name = "token", length = 255)
+    private String token;
+
+    @Column(name = "token_hash", length = 64)
     private String tokenHash;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -36,7 +39,16 @@ public class PasswordResetToken {
     public PasswordResetToken() {
     }
 
+    public PasswordResetToken(String token, String tokenHash, User user, LocalDateTime expiryDate) {
+        this.token = token;
+        this.tokenHash = tokenHash;
+        this.user = user;
+        this.expiryDate = expiryDate;
+        this.used = false;
+    }
+
     public PasswordResetToken(String tokenHash, User user, LocalDateTime expiryDate) {
+        this.token = tokenHash;
         this.tokenHash = tokenHash;
         this.user = user;
         this.expiryDate = expiryDate;
@@ -54,6 +66,14 @@ public class PasswordResetToken {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getTokenHash() {

@@ -150,6 +150,48 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("POST /api/auth/register returns 400 when first name starts with lowercase letter")
+    void testRegisterUser_FirstName_Lowercase() throws Exception {
+        RegisterRequest request = new RegisterRequest();
+        request.setFirstName("arun"); // lowercase
+        request.setLastName("Smith");
+        request.setDateOfBirth(LocalDate.of(1990, 1, 15));
+        request.setAddress("456 Elm Avenue, Springfield");
+        request.setPhoneNumber("9876543210");
+        request.setEmail("arun.smith@example.com");
+        request.setPassword("StrongP@ss1");
+        request.setConfirmPassword("StrongP@ss1");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.fieldErrors.firstName").value("First name must start with an uppercase letter (A-Z)."));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/register returns 400 when first name starts with digit")
+    void testRegisterUser_FirstName_StartsWithDigit() throws Exception {
+        RegisterRequest request = new RegisterRequest();
+        request.setFirstName("1Arun"); // starts with digit
+        request.setLastName("Smith");
+        request.setDateOfBirth(LocalDate.of(1990, 1, 15));
+        request.setAddress("456 Elm Avenue, Springfield");
+        request.setPhoneNumber("9876543210");
+        request.setEmail("arun.smith@example.com");
+        request.setPassword("StrongP@ss1");
+        request.setConfirmPassword("StrongP@ss1");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.fieldErrors.firstName").value("First name must start with an uppercase letter (A-Z)."));
+    }
+
+    @Test
     @DisplayName("POST /api/auth/login returns 200 when credentials are valid")
     void testLoginUser_Success() throws Exception {
         LoginRequest loginRequest = new LoginRequest("john.smith@example.com", "StrongP@ss1");

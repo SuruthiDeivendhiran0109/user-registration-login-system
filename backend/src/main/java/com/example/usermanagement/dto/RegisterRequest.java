@@ -7,6 +7,7 @@ public class RegisterRequest {
 
     @NotBlank(message = "First name is required.")
     @Size(min = 2, max = 100, message = "First name must be between 2 and 100 characters.")
+    @Pattern(regexp = "^[A-Z].*$", message = "First name must start with an uppercase letter (A-Z).")
     @Pattern(regexp = "^[A-Za-z\\s'-]+$", message = "First name must contain only letters, spaces, hyphens, or apostrophes.")
     private String firstName;
 
