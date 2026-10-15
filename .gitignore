@@ -1,0 +1,63 @@
+# ==========================================
+# Root .gitignore for User Registration App
+# ==========================================
+
+# Environment variables & secrets (CRITICAL)
+.env
+*.env
+!.env.example
+*.local
+
+# Node & Frontend build
+node_modules/
+dist/
+dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Java & Backend build (Maven)
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE & Editor artifacts
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+.apt_generated/
+.factorypath
+.springBeans/
+.sts4-cache/
+
+# Operating System files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Logs
+logs/
+*.log
+
+# Legacy folder exclusion
+backend-node-legacy/
