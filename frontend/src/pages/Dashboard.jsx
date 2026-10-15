@@ -54,14 +54,14 @@ function Sidebar({ user, onLogoutClick, mobileOpen, onClose }) {
     <>
       {/* Mobile overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={onClose} />
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden transition-opacity" onClick={onClose} />
       )}
 
       <aside className={`sidebar ${mobileOpen ? 'open' : ''}`}>
-        {/* Logo */}
-        <div className="p-5 border-b border-white/07">
+        {/* Logo & Close button on mobile */}
+        <div className="p-4 sm:p-5 border-b border-white/07 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20">
               <ShieldCheck className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -69,15 +69,22 @@ function Sidebar({ user, onLogoutClick, mobileOpen, onClose }) {
               <p className="text-slate-500 text-[11px]">Enterprise Security</p>
             </div>
           </div>
+          <button
+            onClick={onClose}
+            aria-label="Close menu"
+            className="md:hidden text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* User card */}
         <div className="p-4 border-b border-white/07">
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/60">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/60 border border-slate-700/40">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-md">
               {initial}
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-white font-semibold text-sm truncate">
                 {user?.firstName} {user?.lastName}
               </p>
@@ -109,7 +116,10 @@ function Sidebar({ user, onLogoutClick, mobileOpen, onClose }) {
         {/* Logout at bottom */}
         <div className="p-4 border-t border-white/07">
           <button
-            onClick={onLogoutClick}
+            onClick={() => {
+              onClose();
+              onLogoutClick();
+            }}
             className="nav-item w-full text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
           >
             <LogOut className="w-4 h-4 shrink-0" />
@@ -124,15 +134,22 @@ function Sidebar({ user, onLogoutClick, mobileOpen, onClose }) {
 /* ─── Top Navbar (mobile) ─── */
 function TopBar({ user, onMenuClick, onLogoutClick }) {
   return (
-    <header className="sticky top-0 z-20 bg-slate-950/90 backdrop-blur-xl border-b border-white/07 px-4 py-3 flex items-center justify-between md:hidden">
-      <button onClick={onMenuClick} className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors">
+    <header className="sticky top-0 z-20 bg-slate-950/90 backdrop-blur-xl border-b border-white/07 px-4 py-2.5 flex items-center justify-between md:hidden">
+      <button
+        onClick={onMenuClick}
+        aria-label="Open navigation menu"
+        className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+      >
         <Menu className="w-5 h-5" />
       </button>
       <div className="flex items-center gap-2">
         <ShieldCheck className="w-5 h-5 text-sky-400" />
-        <span className="text-white font-bold text-sm">AuthVault</span>
+        <span className="text-white font-bold text-sm tracking-tight">AuthVault</span>
       </div>
-      <button onClick={onLogoutClick} className="flex items-center gap-1.5 text-xs text-rose-400 hover:text-rose-300 px-3 py-1.5 rounded-lg hover:bg-rose-500/10 transition-colors">
+      <button
+        onClick={onLogoutClick}
+        className="flex items-center gap-1.5 text-xs font-medium text-rose-400 hover:text-rose-300 px-3 py-2 min-h-[40px] rounded-lg hover:bg-rose-500/10 transition-colors"
+      >
         <LogOut className="w-3.5 h-3.5" />
         Logout
       </button>
@@ -175,7 +192,7 @@ function ProfileField({ icon: Icon, label, value, color = 'text-sky-400' }) {
         <Icon className={`w-3.5 h-3.5 ${color}`} />
         {label}
       </p>
-      <p className="text-white font-semibold text-sm pl-5">{value || '—'}</p>
+      <p className="text-white font-semibold text-sm pl-5 break-words">{value || '—'}</p>
     </div>
   );
 }
@@ -278,17 +295,17 @@ export default function Dashboard() {
                 <code className="text-sky-300 font-mono text-xs">(user_management_db)</code>.
               </p>
             </div>
-            <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
               <button
                 onClick={handleRefresh} disabled={refreshing}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all duration-200 disabled:opacity-60 cursor-pointer"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all duration-200 disabled:opacity-60 cursor-pointer"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-sky-400' : ''}`} />
                 {refreshing ? 'Querying MySQL...' : 'Refresh from Database'}
               </button>
               <button
                 onClick={() => setShowLogoutModal(true)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-rose-300 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 hover:border-rose-500/50 transition-all duration-200 cursor-pointer"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-sm font-semibold text-rose-300 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 hover:border-rose-500/50 transition-all duration-200 cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
                 Log Out
@@ -298,7 +315,7 @@ export default function Dashboard() {
 
           {/* Refresh notification */}
           {refreshMsg && (
-            <div className={`p-4 rounded-xl text-sm flex items-center gap-3 ${
+            <div className={`p-4 rounded-xl text-sm flex items-center gap-3 break-words ${
               refreshMsg.type === 'success'
                 ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300'
                 : 'bg-rose-500/10 border border-rose-500/30 text-rose-300'
@@ -306,12 +323,12 @@ export default function Dashboard() {
               {refreshMsg.type === 'success'
                 ? <CheckCircle2 className="w-4 h-4 shrink-0" />
                 : <AlertTriangle className="w-4 h-4 shrink-0" />}
-              {refreshMsg.text}
+              <span className="flex-1 break-words">{refreshMsg.text}</span>
             </div>
           )}
 
           {/* Security cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {[
               {
                 icon: ShieldCheck, iconCls: 'text-sky-400', bg: 'bg-sky-500/10 border-sky-500/25',
@@ -333,29 +350,29 @@ export default function Dashboard() {
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${bg}`}>
                   <Icon className={`w-6 h-6 ${iconCls}`} />
                 </div>
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{label}</p>
-                  <p className="text-sm font-bold text-white mt-0.5">{title}</p>
-                  <p className="text-xs mt-0.5">{sub}</p>
+                  <p className="text-sm font-bold text-white mt-0.5 truncate">{title}</p>
+                  <p className="text-xs mt-0.5 truncate">{sub}</p>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Profile card */}
-          <div className="glass-panel rounded-2xl p-6 sm:p-8">
+          <div className="glass-panel rounded-2xl p-5 sm:p-7 lg:p-8">
             {/* Profile header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-white/10 gap-4 mb-6">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-2xl font-black text-white shadow-lg shadow-sky-500/30">
+              <div className="flex items-center gap-4 min-w-0">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-xl sm:text-2xl font-black text-white shadow-lg shadow-sky-500/30 shrink-0">
                   {data?.firstName?.[0]?.toUpperCase() || 'U'}
                 </div>
-                <div>
-                  <h2 className="text-xl font-bold text-white">{data?.firstName} {data?.lastName}</h2>
-                  <p className="text-slate-400 text-sm">{data?.email}</p>
+                <div className="min-w-0">
+                  <h2 className="text-lg sm:text-xl font-bold text-white truncate">{data?.firstName} {data?.lastName}</h2>
+                  <p className="text-slate-400 text-xs sm:text-sm break-all">{data?.email}</p>
                 </div>
               </div>
-              <div className="text-left sm:text-right">
+              <div className="text-left sm:text-right shrink-0">
                 <span className="text-xs text-slate-400">Registered On</span>
                 <p className="text-sm font-semibold text-slate-200 mt-0.5 flex items-center gap-1.5 sm:justify-end">
                   <Clock className="w-4 h-4 text-sky-400" />
@@ -365,7 +382,7 @@ export default function Dashboard() {
             </div>
 
             {/* Field grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <ProfileField icon={User} label="First Name" value={data?.firstName} />
               <ProfileField icon={User} label="Last Name" value={data?.lastName} />
               <ProfileField icon={Mail} label="Email Address" value={data?.email} color="text-indigo-400" />

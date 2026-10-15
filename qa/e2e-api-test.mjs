@@ -23,7 +23,7 @@ const API = process.env.API_BASE || 'http://localhost:5000';
 const ORIGIN = 'http://localhost:3000';
 const MYSQL_BIN = process.env.MYSQL_BIN || 'C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysql.exe';
 const DB_USER = process.env.DB_USER || 'root';
-const DB_PASSWORD = process.env.DB_PASSWORD;
+const DB_PASSWORD = process.env.DB_PASSWORD || process.env.SPRING_DATASOURCE_PASSWORD;
 const RUN = Date.now().toString(36);
 
 const results = [];

@@ -4,17 +4,17 @@ import { CheckCircle2, LogIn, Database, Lock, ArrowRight } from 'lucide-react';
 
 export default function RegisterSuccess() {
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden bg-slate-950">
+    <div className="relative min-h-screen flex items-center justify-center p-4 py-8 sm:py-16 overflow-hidden bg-slate-950">
       <div className="absolute top-1/3 -left-40 w-96 h-96 bg-emerald-600/15 rounded-full blur-3xl pointer-events-none animate-glow-1" />
       <div className="absolute bottom-1/3 -right-40 w-96 h-96 bg-sky-600/15 rounded-full blur-3xl pointer-events-none animate-glow-2" />
 
       <div className="relative w-full max-w-md z-10 fade-in-up">
-        <div className="glass-panel p-8 sm:p-12 rounded-3xl text-center">
+        <div className="glass-panel p-6 sm:p-10 rounded-2xl sm:rounded-3xl text-center">
 
           {/* Success icon */}
           <div className="flex justify-center mb-6">
-            <div className="w-24 h-24 rounded-full bg-emerald-500/15 border-2 border-emerald-500/40 flex items-center justify-center check-animate">
-              <CheckCircle2 className="w-12 h-12 text-emerald-400" />
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-emerald-500/15 border-2 border-emerald-500/40 flex items-center justify-center check-animate">
+              <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 text-emerald-400" />
             </div>
           </div>
 
@@ -28,7 +28,7 @@ export default function RegisterSuccess() {
 
           <Link
             to="/login"
-            className="inline-flex items-center justify-center gap-2 w-full py-3.5 px-6 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 shadow-lg shadow-sky-500/25 active:scale-[0.99] transition-all duration-200"
+            className="inline-flex items-center justify-center gap-2 w-full py-3.5 px-6 min-h-[48px] rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 shadow-lg shadow-sky-500/25 active:scale-[0.99] transition-all duration-200"
           >
             <LogIn className="w-4 h-4" />
             Go to Login

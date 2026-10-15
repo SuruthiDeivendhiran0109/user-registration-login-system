@@ -108,7 +108,7 @@ export default function ResetPassword() {
   const strength = calcStrength(formData.newPassword);
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden bg-slate-950">
+    <div className="relative min-h-screen flex items-center justify-center p-4 py-8 sm:py-16 overflow-hidden bg-slate-950">
       {/* Ambient background glows */}
       <div className="absolute top-1/4 -right-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none animate-glow-1" />
       <div className="absolute bottom-1/4 -left-40 w-96 h-96 bg-sky-600/20 rounded-full blur-3xl pointer-events-none animate-glow-2" />
@@ -117,15 +117,15 @@ export default function ResetPassword() {
       <div className="relative w-full max-w-md z-10 fade-in-up">
         {/* Navigation link */}
         <div className="mb-6 flex justify-center">
-          <Link to="/login" className="inline-flex items-center gap-2 text-slate-400 hover:text-sky-400 text-sm transition-colors">
+          <Link to="/login" className="inline-flex items-center gap-2 text-slate-400 hover:text-sky-400 text-sm transition-colors min-h-[44px] px-3">
             <ArrowLeft className="w-4 h-4" />
             Back to Sign In
           </Link>
         </div>
 
-        <div className="glass-panel p-8 sm:p-10 rounded-3xl">
+        <div className="glass-panel p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl">
           {/* Header */}
-          <div className="flex flex-col items-center text-center mb-8">
+          <div className="flex flex-col items-center text-center mb-6 sm:mb-8">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-500/20 to-indigo-500/20 border border-sky-500/30 flex items-center justify-center mb-4">
               <KeyRound className="w-7 h-7 text-sky-400" />
             </div>
@@ -137,7 +137,7 @@ export default function ResetPassword() {
 
           {/* Missing token alert */}
           {!token && (
-            <div className="mb-5 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs space-y-2">
+            <div className="mb-5 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs space-y-2 break-words">
               <div className="flex items-center gap-2 font-semibold text-amber-300">
                 <AlertTriangle className="w-4 h-4 shrink-0" />
                 <span>Missing Reset Token</span>
@@ -154,9 +154,9 @@ export default function ResetPassword() {
           )}
 
           {serverError && (
-            <div className="mb-5 p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5">
+            <div className="mb-5 p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5 break-words">
               <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-              <div className="space-y-1">
+              <div className="space-y-1 flex-1 break-words">
                 <p className="font-semibold text-rose-200">Unable to Reset Password</p>
                 <p>{serverError}</p>
                 <div className="pt-1">
@@ -185,14 +185,14 @@ export default function ResetPassword() {
                   onBlur={handleBlur}
                   placeholder="At least 8 characters"
                   autoComplete="new-password"
-                  className={`glass-input w-full pl-10 pr-11 py-3 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none ${
+                  className={`glass-input w-full pl-10 pr-12 py-3 min-h-[46px] rounded-xl text-base sm:text-sm text-white placeholder:text-slate-500 focus:outline-none ${
                     touched.newPassword && errors.newPassword ? 'border-rose-500/60 bg-rose-500/5' : ''
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPw(p => !p)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
                   aria-label={showPw ? 'Hide password' : 'Show password'}
                 >
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -237,14 +237,14 @@ export default function ResetPassword() {
                   onBlur={handleBlur}
                   placeholder="Re-enter new password"
                   autoComplete="new-password"
-                  className={`glass-input w-full pl-10 pr-11 py-3 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none ${
+                  className={`glass-input w-full pl-10 pr-12 py-3 min-h-[46px] rounded-xl text-base sm:text-sm text-white placeholder:text-slate-500 focus:outline-none ${
                     touched.confirmPassword && errors.confirmPassword ? 'border-rose-500/60 bg-rose-500/5' : ''
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowCpw(p => !p)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
                   aria-label={showCpw ? 'Hide confirm password' : 'Show confirm password'}
                 >
                   {showCpw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -258,7 +258,7 @@ export default function ResetPassword() {
             </div>
 
             {/* Requirements checklist */}
-            <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-3 grid grid-cols-2 gap-1 text-[11px]">
+            <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[11px]">
               {[
                 [formData.newPassword.length >= 8, '8+ characters'],
                 [/[A-Z]/.test(formData.newPassword), '1 uppercase letter'],
@@ -266,7 +266,7 @@ export default function ResetPassword() {
                 [/[0-9]/.test(formData.newPassword), '1 number'],
                 [/[^A-Za-z0-9]/.test(formData.newPassword), '1 special symbol'],
               ].map(([ok, txt]) => (
-                <span key={txt} className={`flex items-center gap-1 ${ok ? 'text-emerald-400' : 'text-slate-500'}`}>
+                <span key={txt} className={`inline-flex items-center gap-1 shrink-0 ${ok ? 'text-emerald-400' : 'text-slate-500'}`}>
                   <span>{ok ? '✓' : '○'}</span> {txt}
                 </span>
               ))}
@@ -275,7 +275,7 @@ export default function ResetPassword() {
             <button
               type="submit"
               disabled={submitting || !token}
-              className="w-full mt-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 shadow-lg shadow-sky-500/20 active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
+              className="w-full mt-2 py-3 px-4 min-h-[48px] rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 shadow-lg shadow-sky-500/20 active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
             >
               {submitting ? (
                 <>

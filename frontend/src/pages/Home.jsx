@@ -19,41 +19,41 @@ const steps = [
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen bg-slate-950 overflow-hidden">
+    <div className="relative min-h-screen bg-slate-950 overflow-x-hidden overflow-y-auto w-full">
       {/* Ambient glow */}
-      <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-sky-600/15 rounded-full blur-3xl pointer-events-none animate-glow-1" />
-      <div className="absolute bottom-20 right-1/4 w-[500px] h-[500px] bg-indigo-600/15 rounded-full blur-3xl pointer-events-none animate-glow-2" />
+      <div className="absolute top-10 sm:top-20 left-1/2 -translate-x-1/2 sm:left-1/4 sm:translate-x-0 w-64 h-64 sm:w-[500px] sm:h-[500px] bg-sky-600/15 rounded-full blur-3xl pointer-events-none animate-glow-1 max-w-[80vw]" />
+      <div className="absolute bottom-10 sm:bottom-20 right-1/2 translate-x-1/2 sm:right-1/4 sm:translate-x-0 w-64 h-64 sm:w-[500px] sm:h-[500px] bg-indigo-600/15 rounded-full blur-3xl pointer-events-none animate-glow-2 max-w-[80vw]" />
       <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:28px_28px] opacity-20 pointer-events-none" />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-16 sm:py-24">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-12 sm:py-20 lg:py-24">
 
         {/* Hero */}
-        <div className="text-center mb-20 fade-in-up">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-sm font-medium mb-6">
+        <div className="text-center mb-16 sm:mb-20 fade-in-up">
+          <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs sm:text-sm font-medium mb-5 sm:mb-6">
             <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
             React + Spring Boot + MySQL — Full Stack
           </div>
-          <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight mb-6">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-5 sm:mb-6">
             User Registration
             <span className="block bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
               & Login System
             </span>
           </h1>
-          <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10">
+          <p className="text-base sm:text-lg lg:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10 px-2">
             A production-grade authentication system with secure session management,
             real MySQL persistence, and BCrypt password hashing.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 sm:gap-4 max-w-md sm:max-w-none mx-auto">
             <Link
               to="/register"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-semibold text-sm shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 hover:from-sky-400 hover:to-indigo-500 transition-all duration-200 active:scale-[0.98]"
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-semibold text-sm shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 hover:from-sky-400 hover:to-indigo-500 transition-all duration-200 active:scale-[0.98] min-h-[48px]"
             >
               <UserPlus className="w-4 h-4" />
               Create Account
             </Link>
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm border border-slate-700 transition-all duration-200 active:scale-[0.98]"
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm border border-slate-700 transition-all duration-200 active:scale-[0.98] min-h-[48px]"
             >
               <LogIn className="w-4 h-4" />
               Sign In
@@ -75,8 +75,8 @@ export default function Home() {
         </div>
 
         {/* Application Flow */}
-        <div className="glass-panel rounded-3xl p-8 sm:p-10">
-          <div className="text-center mb-10">
+        <div className="glass-panel rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-10">
+          <div className="text-center mb-8 sm:mb-10">
             <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">Application Flow</h2>
             <p className="text-slate-400 text-sm">Complete 6-step journey from registration to dashboard</p>
           </div>

@@ -85,7 +85,7 @@ export default function Login() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden bg-slate-950">
+    <div className="relative min-h-screen flex items-center justify-center p-4 py-8 sm:py-16 overflow-hidden bg-slate-950">
       {/* Ambient glows */}
       <div className="absolute top-1/4 -left-40 w-96 h-96 bg-sky-600/20 rounded-full blur-3xl pointer-events-none animate-glow-1" />
       <div className="absolute bottom-1/4 -right-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none animate-glow-2" />
@@ -94,15 +94,15 @@ export default function Login() {
       <div className="relative w-full max-w-md z-10 fade-in-up">
         {/* Home link */}
         <div className="mb-6 flex justify-center">
-          <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-sky-400 text-sm transition-colors">
+          <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-sky-400 text-sm transition-colors min-h-[44px] px-3">
             <Home className="w-4 h-4" />
             Back to Home
           </Link>
         </div>
 
-        <div className="glass-panel p-8 sm:p-10 rounded-3xl">
+        <div className="glass-panel p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl">
           {/* Header */}
-          <div className="flex flex-col items-center text-center mb-8">
+          <div className="flex flex-col items-center text-center mb-6 sm:mb-8">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-500/20 to-indigo-500/20 border border-sky-500/30 flex items-center justify-center mb-4">
               <LogIn className="w-7 h-7 text-sky-400" />
             </div>
@@ -112,7 +112,7 @@ export default function Login() {
 
           {/* Flash message */}
           {flashMsg && (
-            <div className={`mb-5 p-4 rounded-xl text-sm flex items-start gap-3 ${
+            <div className={`mb-5 p-4 rounded-xl text-sm flex items-start gap-3 break-words ${
               flashMsg.type === 'success'
                 ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300'
                 : flashMsg.type === 'error'
@@ -122,8 +122,8 @@ export default function Login() {
               {flashMsg.type === 'success'
                 ? <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
                 : <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />}
-              <span>{flashMsg.text}</span>
-              <button onClick={() => setFlashMsg(null)} className="ml-auto text-current opacity-50 hover:opacity-100">✕</button>
+              <span className="flex-1 break-words">{flashMsg.text}</span>
+              <button onClick={() => setFlashMsg(null)} className="ml-auto text-current opacity-50 hover:opacity-100 p-1 min-w-[28px] min-h-[28px] flex items-center justify-center">✕</button>
             </div>
           )}
 
@@ -154,7 +154,8 @@ export default function Login() {
                   value={formData.email} onChange={handleChange} onBlur={handleBlur}
                   placeholder="Email address"
                   autoComplete="email"
-                  className={`glass-input w-full pl-10 pr-4 py-3 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none ${
+                  inputMode="email"
+                  className={`glass-input w-full pl-10 pr-4 py-3 min-h-[46px] rounded-xl text-base sm:text-sm text-white placeholder:text-slate-500 focus:outline-none ${
                     touched.email && errors.email ? 'border-rose-500/60 bg-rose-500/5' :
                     touched.email && !errors.email && formData.email ? 'border-emerald-500/40' : ''
                   }`}
@@ -175,7 +176,7 @@ export default function Login() {
                 </label>
                 <Link
                   to="/forgot-password"
-                  className="text-xs text-sky-400 hover:text-sky-300 transition-colors underline-offset-4 hover:underline"
+                  className="text-xs text-sky-400 hover:text-sky-300 transition-colors underline-offset-4 hover:underline py-1"
                 >
                   Forgot password?
                 </Link>
@@ -187,14 +188,14 @@ export default function Login() {
                   value={formData.password} onChange={handleChange} onBlur={handleBlur}
                   placeholder="Password"
                   autoComplete="current-password"
-                  className={`glass-input w-full pl-10 pr-11 py-3 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none ${
+                  className={`glass-input w-full pl-10 pr-12 py-3 min-h-[46px] rounded-xl text-base sm:text-sm text-white placeholder:text-slate-500 focus:outline-none ${
                     touched.password && errors.password ? 'border-rose-500/60 bg-rose-500/5' : ''
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(p => !p)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -208,7 +209,7 @@ export default function Login() {
             </div>
 
             {/* Remember me */}
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 py-1">
               <input
                 id="rememberMe" name="rememberMe" type="checkbox"
                 checked={formData.rememberMe} onChange={handleChange}
@@ -220,7 +221,7 @@ export default function Login() {
             {/* Submit */}
             <button
               type="submit" disabled={submitting}
-              className="w-full mt-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 shadow-lg shadow-sky-500/20 hover:shadow-sky-500/35 active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full mt-2 py-3 px-4 min-h-[48px] rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 shadow-lg shadow-sky-500/20 hover:shadow-sky-500/35 active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             >
               {submitting ? (
                 <>

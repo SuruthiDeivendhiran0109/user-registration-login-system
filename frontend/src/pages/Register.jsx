@@ -81,23 +81,25 @@ function validateField(name, value, all) {
   return null;
 }
 
-function Field({ label, id, name, type = 'text', value, onChange, onBlur, touched, errors, icon: Icon, placeholder, endAdornment, as, rows, maxLength, inputMode }) {
+function Field({ label, id, name, type = 'text', value, onChange, onBlur, touched, errors, icon: Icon, placeholder, endAdornment, as, rows, maxLength, inputMode, autoComplete }) {
   const err = touched?.[name] ? errors?.[name] : null;
   const ok = touched?.[name] && !errors?.[name] && value;
-  const cls = `glass-input w-full ${Icon ? 'pl-10' : 'pl-4'} ${endAdornment ? 'pr-11' : 'pr-4'} py-3 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none ${err ? 'border-rose-500/60 bg-rose-500/5' : ok ? 'border-emerald-500/40' : ''}`;
+  const cls = `glass-input w-full ${Icon ? 'pl-10' : 'pl-4'} ${endAdornment ? 'pr-12' : 'pr-4'} py-3 min-h-[46px] rounded-xl text-base sm:text-sm text-white placeholder:text-slate-500 focus:outline-none ${err ? 'border-rose-500/60 bg-rose-500/5' : ok ? 'border-emerald-500/40' : ''}`;
   return (
     <div>
       <label htmlFor={id} className="block text-sm font-medium text-slate-300 mb-1.5">
         {label} <span className="text-rose-400">*</span>
       </label>
       <div className="relative">
-        {Icon && <Icon className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400 pointer-events-none" />}
-        {as === 'textarea' ? (
-          <textarea id={id} name={name} rows={rows || 2} value={value} onChange={onChange} onBlur={onBlur} placeholder={placeholder} className={cls} />
-        ) : (
-          <input id={id} name={name} type={type} value={value} onChange={onChange} onBlur={onBlur} placeholder={placeholder} className={cls} maxLength={maxLength} inputMode={inputMode} />
+        {Icon && (
+          <Icon className={`absolute left-3.5 ${as === 'textarea' ? 'top-3.5' : 'top-1/2 -translate-y-1/2'} w-4 h-4 text-slate-400 pointer-events-none`} />
         )}
-        {endAdornment && <span className="absolute right-3.5 top-1/2 -translate-y-1/2">{endAdornment}</span>}
+        {as === 'textarea' ? (
+          <textarea id={id} name={name} rows={rows || 2} value={value} onChange={onChange} onBlur={onBlur} placeholder={placeholder} className={`${cls} min-h-[70px] pt-3`} />
+        ) : (
+          <input id={id} name={name} type={type} value={value} onChange={onChange} onBlur={onBlur} placeholder={placeholder} className={cls} maxLength={maxLength} inputMode={inputMode} autoComplete={autoComplete} />
+        )}
+        {endAdornment && <span className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center">{endAdornment}</span>}
       </div>
       {err && <p className="mt-1 text-xs text-rose-400 flex items-center gap-1"><AlertTriangle className="w-3 h-3" />{err}</p>}
     </div>
@@ -164,22 +166,22 @@ export default function Register() {
   const strength = calcStrength(form.password);
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 py-20 overflow-hidden bg-slate-950">
+    <div className="relative min-h-screen flex items-center justify-center p-4 py-8 sm:py-16 overflow-hidden bg-slate-950">
       <div className="absolute top-1/4 -right-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none animate-glow-1" />
       <div className="absolute bottom-10 -left-40 w-96 h-96 bg-sky-600/20 rounded-full blur-3xl pointer-events-none animate-glow-2" />
       <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-20 pointer-events-none" />
 
       <div className="relative w-full max-w-2xl z-10 fade-in-up">
         <div className="mb-6 flex justify-center">
-          <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-sky-400 text-sm transition-colors">
+          <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-sky-400 text-sm transition-colors min-h-[44px] px-3">
             <Home className="w-4 h-4" />
             Back to Home
           </Link>
         </div>
 
-        <div className="glass-panel p-6 sm:p-10 rounded-3xl">
+        <div className="glass-panel p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl">
           {/* Header */}
-          <div className="flex flex-col items-center text-center mb-8">
+          <div className="flex flex-col items-center text-center mb-6 sm:mb-8">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-500/20 to-indigo-500/20 border border-sky-500/30 flex items-center justify-center mb-4">
               <UserPlus className="w-7 h-7 text-sky-400" />
             </div>
@@ -188,31 +190,31 @@ export default function Register() {
           </div>
 
           {serverErr && (
-            <div className="mb-5 p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm flex items-start gap-3">
+            <div className="mb-5 p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm flex items-start gap-3 break-words">
               <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-              <span>{serverErr}</span>
-              <button onClick={() => setServerErr(null)} className="ml-auto opacity-50 hover:opacity-100">✕</button>
+              <span className="flex-1 break-words">{serverErr}</span>
+              <button onClick={() => setServerErr(null)} className="ml-auto opacity-50 hover:opacity-100 p-1 min-w-[28px] min-h-[28px] flex items-center justify-center">✕</button>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             {/* Row 1: First + Last name */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field id="firstName" name="firstName" label="First Name" value={form.firstName} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} icon={User} placeholder="Enter first name" />
-              <Field id="lastName" name="lastName" label="Last Name" value={form.lastName} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} icon={User} placeholder="Enter last name" />
+              <Field id="firstName" name="firstName" label="First Name" value={form.firstName} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} icon={User} placeholder="Enter first name" autoComplete="given-name" />
+              <Field id="lastName" name="lastName" label="Last Name" value={form.lastName} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} icon={User} placeholder="Enter last name" autoComplete="family-name" />
             </div>
 
             {/* Row 2: DOB + Phone */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field id="dateOfBirth" name="dateOfBirth" label="Date of Birth" type="date" value={form.dateOfBirth} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} icon={Calendar} />
-              <Field id="phoneNumber" name="phoneNumber" label="Phone Number" type="tel" value={form.phoneNumber} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} icon={Phone} placeholder="Enter 10-digit phone number" maxLength={10} inputMode="numeric" />
+              <Field id="dateOfBirth" name="dateOfBirth" label="Date of Birth" type="date" value={form.dateOfBirth} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} icon={Calendar} autoComplete="bday" />
+              <Field id="phoneNumber" name="phoneNumber" label="Phone Number" type="tel" value={form.phoneNumber} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} icon={Phone} placeholder="Enter 10-digit phone number" maxLength={10} inputMode="numeric" autoComplete="tel" />
             </div>
 
             {/* Address */}
-            <Field id="address" name="address" label="Address" as="textarea" rows={2} value={form.address} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} icon={MapPin} placeholder="Enter address" />
+            <Field id="address" name="address" label="Address" as="textarea" rows={2} value={form.address} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} icon={MapPin} placeholder="Enter address" autoComplete="street-address" />
 
             {/* Email */}
-            <Field id="email" name="email" label="Email" type="email" value={form.email} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} icon={Mail} placeholder="Enter email" />
+            <Field id="email" name="email" label="Email" type="email" value={form.email} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} icon={Mail} placeholder="Enter email" inputMode="email" autoComplete="email" />
 
             {/* Row 3: Password + Confirm */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -222,9 +224,10 @@ export default function Register() {
                   type={showPw ? 'text' : 'password'} value={form.password}
                   onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors}
                   icon={Lock} placeholder="Enter password"
+                  autoComplete="new-password"
                   endAdornment={
                     <button type="button" onClick={() => setShowPw(p => !p)}
-                      className="text-slate-400 hover:text-white transition-colors" aria-label="Toggle password">
+                      className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white transition-colors" aria-label="Toggle password">
                       {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   }
@@ -246,9 +249,10 @@ export default function Register() {
                 type={showCpw ? 'text' : 'password'} value={form.confirmPassword}
                 onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors}
                 icon={Lock} placeholder="Confirm password"
+                autoComplete="new-password"
                 endAdornment={
                   <button type="button" onClick={() => setShowCpw(p => !p)}
-                    className="text-slate-400 hover:text-white transition-colors" aria-label="Toggle confirm password">
+                    className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white transition-colors" aria-label="Toggle confirm password">
                     {showCpw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 }
@@ -256,7 +260,7 @@ export default function Register() {
             </div>
 
             {/* Password rules */}
-            <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-3 grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-[11px]">
+            <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[11px]">
               {[
                 [form.password.length >= 8, '8+ characters'],
                 [/[A-Z]/.test(form.password), '1 uppercase letter'],
@@ -264,7 +268,7 @@ export default function Register() {
                 [/[0-9]/.test(form.password), '1 number'],
                 [/[^A-Za-z0-9]/.test(form.password), '1 special character'],
               ].map(([ok, txt]) => (
-                <span key={txt} className={`flex items-center gap-1 ${ok ? 'text-emerald-400' : 'text-slate-500'}`}>
+                <span key={txt} className={`inline-flex items-center gap-1 shrink-0 ${ok ? 'text-emerald-400' : 'text-slate-500'}`}>
                   <span>{ok ? '✓' : '○'}</span> {txt}
                 </span>
               ))}
@@ -272,7 +276,7 @@ export default function Register() {
 
             <button
               type="submit" disabled={submitting}
-              className="w-full mt-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 shadow-lg shadow-sky-500/20 active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full mt-2 py-3 px-4 min-h-[48px] rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 shadow-lg shadow-sky-500/20 active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             >
               {submitting ? (
                 <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>Creating Account...</span></>
