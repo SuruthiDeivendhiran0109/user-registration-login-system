@@ -143,6 +143,7 @@ async function main() {
     ['Invalid phone "abcdefghij"', { ...userA, email: negEmail('ph1'), phoneNumber: 'abcdefghij' }, 400, r => r.json?.fieldErrors?.phoneNumber],
     ['Invalid phone with no digits "----------"', { ...userA, email: negEmail('ph2'), phoneNumber: '----------' }, 400, r => r.json?.fieldErrors?.phoneNumber],
     ['Invalid phone too short "12345"', { ...userA, email: negEmail('ph3'), phoneNumber: '12345' }, 400, r => r.json?.fieldErrors?.phoneNumber],
+    ['Invalid phone too long "12345678901"', { ...userA, email: negEmail('ph4'), phoneNumber: '12345678901' }, 400, r => r.json?.fieldErrors?.phoneNumber],
     ['Future date of birth', { ...userA, email: negEmail('dob1'), dateOfBirth: future }, 400, r => r.json?.fieldErrors?.dateOfBirth],
     ['Missing date of birth', { ...userA, email: negEmail('dob2'), dateOfBirth: null }, 400, r => r.json?.fieldErrors?.dateOfBirth],
     ['Invalid date "2000-13-45"', { ...userA, email: negEmail('dob3'), dateOfBirth: '2000-13-45' }, 400, null],

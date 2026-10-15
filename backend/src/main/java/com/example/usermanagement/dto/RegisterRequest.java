@@ -24,7 +24,7 @@ public class RegisterRequest {
     private String address;
 
     @NotBlank(message = "Phone number is required.")
-    @Pattern(regexp = "^(?=(?:\\D*\\d){10,15}\\D*$)[+]?[0-9\\s()\\-]{10,25}$", message = "Phone number must contain between 10 and 15 digits.")
+    @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must contain exactly 10 digits.")
     private String phoneNumber;
 
     @NotBlank(message = "Email address is required.")

@@ -49,9 +49,11 @@ function validateField(name, value, all) {
       if (value.trim().length < 5) return 'At least 5 characters.';
       break;
     case 'phoneNumber': {
-      if (!value.trim()) return 'Phone number is required.';
-      const digits = value.replace(/\D/g, '');
-      if (digits.length < 10) return 'At least 10 digits required.';
+      const trimmed = (value || '').trim();
+      if (!trimmed) return 'Phone number is required.';
+      if (!/^[0-9]{10}$/.test(trimmed)) {
+        return 'Phone number must contain exactly 10 digits.';
+      }
       break;
     }
     case 'email':
@@ -75,7 +77,7 @@ function validateField(name, value, all) {
   return null;
 }
 
-function Field({ label, id, name, type = 'text', value, onChange, onBlur, touched, errors, icon: Icon, placeholder, endAdornment, as, rows }) {
+function Field({ label, id, name, type = 'text', value, onChange, onBlur, touched, errors, icon: Icon, placeholder, endAdornment, as, rows, maxLength, inputMode }) {
   const err = touched?.[name] ? errors?.[name] : null;
   const ok = touched?.[name] && !errors?.[name] && value;
   const cls = `glass-input w-full ${Icon ? 'pl-10' : 'pl-4'} ${endAdornment ? 'pr-11' : 'pr-4'} py-3 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none ${err ? 'border-rose-500/60 bg-rose-500/5' : ok ? 'border-emerald-500/40' : ''}`;
@@ -89,7 +91,7 @@ function Field({ label, id, name, type = 'text', value, onChange, onBlur, touche
         {as === 'textarea' ? (
           <textarea id={id} name={name} rows={rows || 2} value={value} onChange={onChange} onBlur={onBlur} placeholder={placeholder} className={cls} />
         ) : (
-          <input id={id} name={name} type={type} value={value} onChange={onChange} onBlur={onBlur} placeholder={placeholder} className={cls} />
+          <input id={id} name={name} type={type} value={value} onChange={onChange} onBlur={onBlur} placeholder={placeholder} className={cls} maxLength={maxLength} inputMode={inputMode} />
         )}
         {endAdornment && <span className="absolute right-3.5 top-1/2 -translate-y-1/2">{endAdornment}</span>}
       </div>
@@ -199,7 +201,7 @@ export default function Register() {
             {/* Row 2: DOB + Phone */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field id="dateOfBirth" name="dateOfBirth" label="Date of Birth" type="date" value={form.dateOfBirth} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} icon={Calendar} />
-              <Field id="phoneNumber" name="phoneNumber" label="Phone Number" type="tel" value={form.phoneNumber} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} icon={Phone} placeholder="Enter phone number" />
+              <Field id="phoneNumber" name="phoneNumber" label="Phone Number" type="tel" value={form.phoneNumber} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} icon={Phone} placeholder="Enter 10-digit phone number" maxLength={10} inputMode="numeric" />
             </div>
 
             {/* Address */}

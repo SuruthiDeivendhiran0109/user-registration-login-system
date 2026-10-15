@@ -67,7 +67,7 @@ class AuthServiceTest {
         validRegisterRequest.setLastName("Doe");
         validRegisterRequest.setDateOfBirth(LocalDate.of(1995, 5, 20));
         validRegisterRequest.setAddress("123 Maple Street, City, State");
-        validRegisterRequest.setPhoneNumber("+15551234567");
+        validRegisterRequest.setPhoneNumber("9876543210");
         validRegisterRequest.setEmail("jane.doe@example.com");
         validRegisterRequest.setPassword("SecurePass@123");
         validRegisterRequest.setConfirmPassword("SecurePass@123");
@@ -81,7 +81,7 @@ class AuthServiceTest {
 
         User savedUser = new User(
             "Jane", "Doe", LocalDate.of(1995, 5, 20),
-            "123 Maple Street, City, State", "+15551234567",
+            "123 Maple Street, City, State", "9876543210",
             "jane.doe@example.com", "$2a$10$hashedPasswordSample"
         );
         savedUser.setId(1L);
@@ -149,7 +149,7 @@ class AuthServiceTest {
 
         User user = new User(
             "Jane", "Doe", LocalDate.of(1995, 5, 20),
-            "123 Maple Street, City, State", "+15551234567",
+            "123 Maple Street, City, State", "9876543210",
             "jane.doe@example.com", "$2a$10$hashedPasswordSample"
         );
         user.setId(1L);
@@ -168,7 +168,7 @@ class AuthServiceTest {
     void testProcessForgotPassword_Success() {
         User user = new User(
             "Jane", "Doe", LocalDate.of(1995, 5, 20),
-            "123 Maple Street", "+15551234567",
+            "123 Maple Street", "9876543210",
             "jane.doe@example.com", "$2a$10$hashed"
         );
         when(userRepository.findByEmail("jane.doe@example.com")).thenReturn(Optional.of(user));

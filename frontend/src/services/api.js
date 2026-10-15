@@ -1,5 +1,8 @@
 // Centralized API client for communicating with Spring Boot REST API
-const rawBase = import.meta.env.VITE_API_URL || '/api';
+const DEFAULT_PROD_API = 'https://user-registration-backend-ny7r.onrender.com/api';
+const isGithubPages = typeof window !== 'undefined' && window.location.hostname.endsWith('github.io');
+const rawBase = import.meta.env.VITE_API_URL || 
+  (isGithubPages ? DEFAULT_PROD_API : (import.meta.env.PROD ? DEFAULT_PROD_API : '/api'));
 const BASE_URL = rawBase.endsWith('/') ? rawBase.slice(0, -1) : rawBase;
 
 /**

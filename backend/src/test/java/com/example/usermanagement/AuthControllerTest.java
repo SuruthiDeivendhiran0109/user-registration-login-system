@@ -38,6 +38,9 @@ class AuthControllerTest {
     @Mock
     private com.example.usermanagement.service.EmailService emailService;
 
+    @Mock
+    private javax.sql.DataSource dataSource;
+
     @InjectMocks
     private AuthController authController;
 
@@ -45,7 +48,9 @@ class AuthControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(authController)
+                .setControllerAdvice(new com.example.usermanagement.exception.GlobalExceptionHandler())
+                .build();
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
     }
@@ -58,14 +63,14 @@ class AuthControllerTest {
         request.setLastName("Smith");
         request.setDateOfBirth(LocalDate.of(1990, 1, 15));
         request.setAddress("456 Elm Avenue, Springfield");
-        request.setPhoneNumber("+15559876543");
+        request.setPhoneNumber("9876543210");
         request.setEmail("john.smith@example.com");
         request.setPassword("StrongP@ss1");
         request.setConfirmPassword("StrongP@ss1");
 
         User user = new User(
             "John", "Smith", LocalDate.of(1990, 1, 15),
-            "456 Elm Avenue, Springfield", "+15559876543",
+            "456 Elm Avenue, Springfield", "9876543210",
             "john.smith@example.com", "$2a$10$dummyHash"
         );
         user.setId(2L);
@@ -77,7 +82,71 @@ class AuthControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.success").value(true))
-            .andExpect(jsonPath("$.user.email").value("john.smith@example.com"));
+            .andExpect(jsonPath("$.user.email").value("john.smith@example.com"))
+            .andExpect(jsonPath("$.user.phoneNumber").value("9876543210"));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/register returns 400 when phone number is less than 10 digits")
+    void testRegisterUser_PhoneTooShort() throws Exception {
+        RegisterRequest request = new RegisterRequest();
+        request.setFirstName("John");
+        request.setLastName("Smith");
+        request.setDateOfBirth(LocalDate.of(1990, 1, 15));
+        request.setAddress("456 Elm Avenue, Springfield");
+        request.setPhoneNumber("987654321"); // 9 digits
+        request.setEmail("john.smith@example.com");
+        request.setPassword("StrongP@ss1");
+        request.setConfirmPassword("StrongP@ss1");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.fieldErrors.phoneNumber").value("Phone number must contain exactly 10 digits."));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/register returns 400 when phone number exceeds 10 digits")
+    void testRegisterUser_PhoneTooLong() throws Exception {
+        RegisterRequest request = new RegisterRequest();
+        request.setFirstName("John");
+        request.setLastName("Smith");
+        request.setDateOfBirth(LocalDate.of(1990, 1, 15));
+        request.setAddress("456 Elm Avenue, Springfield");
+        request.setPhoneNumber("98765432100"); // 11 digits
+        request.setEmail("john.smith@example.com");
+        request.setPassword("StrongP@ss1");
+        request.setConfirmPassword("StrongP@ss1");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.fieldErrors.phoneNumber").value("Phone number must contain exactly 10 digits."));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/register returns 400 when phone number contains non-digits")
+    void testRegisterUser_PhoneNonDigits() throws Exception {
+        RegisterRequest request = new RegisterRequest();
+        request.setFirstName("John");
+        request.setLastName("Smith");
+        request.setDateOfBirth(LocalDate.of(1990, 1, 15));
+        request.setAddress("456 Elm Avenue, Springfield");
+        request.setPhoneNumber("987654321a"); // Contains letter
+        request.setEmail("john.smith@example.com");
+        request.setPassword("StrongP@ss1");
+        request.setConfirmPassword("StrongP@ss1");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.fieldErrors.phoneNumber").value("Phone number must contain exactly 10 digits."));
     }
 
     @Test
@@ -87,7 +156,7 @@ class AuthControllerTest {
 
         User user = new User(
             "John", "Smith", LocalDate.of(1990, 1, 15),
-            "456 Elm Avenue, Springfield", "+15559876543",
+            "456 Elm Avenue, Springfield", "9876543210",
             "john.smith@example.com", "$2a$10$dummyHash"
         );
         user.setId(2L);

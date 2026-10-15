@@ -22,10 +22,12 @@ public class AuthController {
 
     private final AuthService authService;
     private final com.example.usermanagement.service.EmailService emailService;
+    private final javax.sql.DataSource dataSource;
 
-    public AuthController(AuthService authService, com.example.usermanagement.service.EmailService emailService) {
+    public AuthController(AuthService authService, com.example.usermanagement.service.EmailService emailService, javax.sql.DataSource dataSource) {
         this.authService = authService;
         this.emailService = emailService;
+        this.dataSource = dataSource;
     }
 
     @PostMapping("/auth/register")
@@ -100,7 +102,16 @@ public class AuthController {
         Map<String, String> health = new HashMap<>();
         health.put("status", "UP");
         health.put("service", "Spring Boot User Management API");
-        health.put("database", "MySQL (user_management_db)");
+
+        try (java.sql.Connection conn = dataSource.getConnection()) {
+            health.put("database", "CONNECTED (" + conn.getCatalog() + ")");
+            health.put("dbProduct", conn.getMetaData().getDatabaseProductName());
+        } catch (Exception e) {
+            health.put("database", "DISCONNECTED: " + e.getMessage());
+            health.put("status", "DEGRADED");
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(health);
+        }
+
         return ResponseEntity.ok(health);
     }
 }
