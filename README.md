@@ -128,19 +128,24 @@ CREATE DATABASE IF NOT EXISTS user_management_db
   COLLATE utf8mb4_unicode_ci;
 ```
 
-*(You can also execute the complete SQL script located at [`backend/database/schema.sql`](file:///C:/Users/surut/.gemini/antigravity/scratch/user-auth-app/backend/database/schema.sql)).*
+*(You can also execute the complete SQL script located at [`backend/database/schema.sql`](backend/database/schema.sql)).*
 
 ### Step 2: Configure Database Credentials
 You can provide your MySQL credentials via **Environment Variables** or by setting them in `backend/src/main/resources/application.properties`:
 
-**Option A (PowerShell Environment Variables):**
-```powershell
+**Option A (Environment Variables):**
+```bash
+# Linux / macOS / Bash
+export SPRING_DATASOURCE_USERNAME="root"
+export SPRING_DATASOURCE_PASSWORD="your_actual_password_here"
+
+# Windows PowerShell
 $env:SPRING_DATASOURCE_USERNAME="root"
 $env:SPRING_DATASOURCE_PASSWORD="your_actual_password_here"
 ```
 
 **Option B (File Configuration):**
-Open [`backend/src/main/resources/application.properties`](file:///C:/Users/surut/.gemini/antigravity/scratch/user-auth-app/backend/src/main/resources/application.properties) and update:
+Open [`backend/src/main/resources/application.properties`](backend/src/main/resources/application.properties) or copy `backend/.env.example` to `backend/.env`:
 ```properties
 spring.datasource.username=root
 spring.datasource.password=your_actual_password_here
@@ -148,29 +153,34 @@ spring.datasource.password=your_actual_password_here
 
 ---
 
-## 🚀 5. How to Run the Application (Windows)
+## 🚀 5. How to Run the Application
 
 ### Step 1: Start the Spring Boot Backend API
-Open a terminal window:
+Open a terminal in the project root directory:
 
-```powershell
-cd C:\Users\surut\.gemini\antigravity\scratch\user-auth-app\backend
-& "C:\Users\surut\.gemini\antigravity\scratch\apache-maven-3.9.9\bin\mvn.cmd" spring-boot:run
+```bash
+cd backend
+mvn spring-boot:run
 ```
-*(Or simply `mvn spring-boot:run` if Maven is added to your system PATH)*
+
+*(On Windows PowerShell / Command Prompt: `cd backend` followed by `mvn spring-boot:run`. If Maven is not installed globally, you can use `./mvnw spring-boot:run` on Linux/macOS or `.\mvnw.cmd spring-boot:run` on Windows).*
 
 * **Backend Health Check:** `http://localhost:5000/api/health`
-* **Port:** `5000`
+* **Default Port:** `5000`
 
 ### Step 2: Start the React Frontend
-Open a second terminal window:
+Open a second terminal in the project root directory:
 
-```powershell
-cd C:\Users\surut\.gemini\antigravity\scratch\user-auth-app\frontend
-cmd.exe /c npm run dev
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
+*(On Windows PowerShell, if scripts are restricted by default execution policy, use `npm.cmd install` and `npm.cmd run dev` or run in Command Prompt / Git Bash).*
+
 * **Frontend URL:** `http://localhost:3000`
+* **API Proxy:** In development mode, Vite automatically proxies all `/api` requests to `http://localhost:5000`.
 
 ---
 
@@ -194,12 +204,12 @@ cmd.exe /c npm run dev
 ### Automated Backend Tests (Maven Suite)
 Run the automated test suite with Maven:
 
-```powershell
+```bash
 cd backend
 mvn test
 ```
 
-**Test Results:**
+**Verified Test Results (14 / 14 Passed, 100%):**
 * `AuthServiceTest.testRegisterUser_Success` ✅ Passed
 * `AuthServiceTest.testRegisterUser_PasswordMismatch` ✅ Passed
 * `AuthServiceTest.testRegisterUser_WeakPassword` ✅ Passed
@@ -208,37 +218,67 @@ mvn test
 * `AuthServiceTest.testForgotPassword_Success` ✅ Passed
 * `AuthServiceTest.testResetPassword_Success` ✅ Passed
 * `AuthControllerTest.testRegisterUser_ValidInput` ✅ Passed
+* `AuthControllerTest.testRegisterUser_PhoneTooShort` ✅ Passed
+* `AuthControllerTest.testRegisterUser_PhoneTooLong` ✅ Passed
+* `AuthControllerTest.testRegisterUser_PhoneNonDigits` ✅ Passed
+* `AuthControllerTest.testRegisterUser_FirstName_Lowercase` ✅ Passed
+* `AuthControllerTest.testRegisterUser_FirstName_StartsWithDigit` ✅ Passed
 * `AuthControllerTest.testLoginUser_Success` ✅ Passed
-* **Summary:** `Tests run: 9, Failures: 0, Errors: 0, Skipped: 0` (100% Passed)
+* **Summary:** `Tests run: 14, Failures: 0, Errors: 0, Skipped: 0` (100% Passed)
 
 ### Comprehensive Automated End-to-End Suite
-* **Full Stack & Edge Case Suite (`qa/e2e-api-test.mjs`):** **96 / 96 checks passed (100%)**
+Execute the Node.js test scripts from the root directory:
+
+```bash
+# Run Full-Stack E2E API & Security Test Suite (111 assertions)
+node qa/e2e-api-test.mjs
+
+# Run Responsive & Multi-Device Viewport QA Suite (53 assertions)
+node qa/responsive-qa.mjs
+
+# Run Password Reset Lifecycle Suite (7 stages)
+node qa/test-reset-flow.js
+```
+
+* **Full Stack & Edge Case Suite (`qa/e2e-api-test.mjs`):** **111 / 111 checks passed (100%)**
   - Registration, 8-field negative validation, underage checks, duplicate prevention (409)
+  - First-name uppercase formatting and 10-digit phone number enforcement
   - Direct MySQL persistence & BCrypt password hash verification
   - CSRF cookie lifecycle and session rotation
-  - IDOR security, unauthorized protection (401), and logout invalidation
+  - Multi-account isolation: verified that user A and user B only ever access their own profile
+  - IDOR security, unauthorized protection (401), and logout session invalidation
+* **Responsive Multi-Viewport Suite (`qa/responsive-qa.mjs`):** **53 / 53 checks passed (100%)**
+  - Mobile Small (320px), Mobile Medium (375px), iPhone 14/15 (390px), Mobile Large (414px)
+  - Tablet Portrait (768px), Tablet Landscape / Laptop (1024px)
+  - Standard Desktop (1366px), Full HD Monitor (1920px)
+  - Validates zero horizontal overflow, touch target accessibility (>=40px), hamburger navigation drawer, and readable font sizing
 * **Password Reset Lifecycle Suite (`qa/test-reset-flow.js`):** **7 / 7 stages passed (100%)**
-  - Reset request generation, 256-bit token creation, SHA-256 hash storage in MySQL
+  - Reset request generation, 256-bit token creation, SHA-256 hash storage in database
   - Reset password execution, old password rejection, new password login
   - Token replay prevention (reused token returns 400 Bad Request)
   - Invalid and expired token rejection (400 Bad Request)
 
 ### Manual Verification Checklist
 1. **Registration:**
-   - Navigate to `http://localhost:3000/register`.
+   - Navigate to `/register`.
    - Enter invalid or mismatched passwords — notice immediate inline validation error.
-   - Fill all 8 fields and submit — record is persisted in MySQL and you are redirected to `/login`.
+   - Enter a first name starting with a lowercase letter or digit — validation requires uppercase start.
+   - Fill all 8 fields and submit — record is persisted in the database and you are redirected to `/login`.
    - Attempting to register the same email again yields a `409 Conflict: An account with this email address already exists.`
 2. **Authentication:**
    - Attempt to log in with an incorrect password — receives `401 Unauthorized: Invalid email or password`.
    - Log in with valid credentials — session is established and you are redirected to `/dashboard`.
 3. **Protected Dashboard:**
-   - Profile card displays verified details directly from MySQL (`first_name`, `last_name`, `date_of_birth`, `address`, `phone_number`, `email`, `created_at`).
-   - Open a private/incognito window and visit `http://localhost:3000/dashboard` — immediately redirected to `/login`.
+   - Profile card displays verified details directly from the database (`first_name`, `last_name`, `date_of_birth`, `address`, `phone_number`, `email`, `created_at`).
+   - Open a private/incognito window and visit `/dashboard` — immediately redirected to `/login`.
    - Refreshing the dashboard performs a live fetch to `GET /api/users/me`.
-4. **Logout:**
+4. **Multi-User Isolation:**
+   - Register Account A and log in — dashboard shows Account A's details.
+   - Log out, register Account B and log in — dashboard shows Account B's details. Account A's data is never visible.
+5. **Logout:**
    - Click **Log Out** on the dashboard.
    - Server session is invalidated, `AUTH_SESSION_ID` cookie is cleared, and user is redirected to `/login`.
+   - The same account can log back in immediately using its registered email and password.
 
 ---
 
@@ -246,47 +286,43 @@ mvn test
 
 To create a complete backup of the `user_management_db` database, run:
 
-```powershell
-& "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysqldump.exe" -u root -p user_management_db > C:\Users\surut\backup_user_management_db.sql
+```bash
+mysqldump -u root -p user_management_db > backup_user_management_db.sql
 ```
 
 To restore from a backup:
-```powershell
-& "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p user_management_db < C:\Users\surut\backup_user_management_db.sql
+```bash
+mysql -u root -p user_management_db < backup_user_management_db.sql
 ```
 
 ---
 
-## ☁️ 9. Cloud Deployment Guide
+## ☁️ 9. Cloud Deployment & Live Production URLs
 
-This project is fully containerized and pre-configured for free/low-cost cloud hosting.
+The application is deployed live to production using containerized Spring Boot, TiDB Cloud Serverless MySQL, and GitHub Pages:
 
-### A. Hosted MySQL Database (e.g. Aiven, TiDB Cloud, Railway)
-1. Provision a free MySQL database instance on [Aiven for MySQL](https://aiven.io/) or [TiDB Cloud Serverless](https://tidbcloud.com/).
-2. Run `backend/database/schema.sql` to initialize the database tables and indexes.
-3. Note your JDBC connection URI, database username, and password.
+* **Live Frontend:** [https://suruthideivendhiran0109.github.io/user-registration-login-system/](https://suruthideivendhiran0109.github.io/user-registration-login-system/)
+* **Live Backend API:** [https://user-registration-backend-ny7r.onrender.com](https://user-registration-backend-ny7r.onrender.com)
+* **Backend Health Check:** [https://user-registration-backend-ny7r.onrender.com/api/health](https://user-registration-backend-ny7r.onrender.com/api/health)
 
-### B. Spring Boot Backend (e.g. Render, Railway)
-1. Deploy the `backend/` directory using the provided `backend/Dockerfile` (Eclipse Temurin Java 21).
-2. Configure the following Environment Variables in your hosting dashboard:
-   - `SPRING_DATASOURCE_URL`: `jdbc:mysql://<cloud-db-host>:<port>/<db_name>?useSSL=true&serverTimezone=UTC`
+### A. Hosted MySQL Database (TiDB Cloud Serverless)
+1. Provision a MySQL 8.0-compatible database on [TiDB Cloud](https://tidbcloud.com/).
+2. Run `backend/database/schema.sql` to initialize `users` and `password_reset_tokens` tables.
+3. Configure JDBC connection with TLS (`useSSL=true`).
+
+### B. Spring Boot Backend (Render)
+1. Deploy the `backend/` directory using the provided multi-stage `backend/Dockerfile` (Java 21).
+2. Configure Environment Variables in the Render dashboard:
+   - `SPRING_DATASOURCE_URL`: `jdbc:mysql://<cloud-db-host>:<port>/user_registration?useSSL=true&serverTimezone=UTC`
    - `SPRING_DATASOURCE_USERNAME`: `<cloud-db-user>`
    - `SPRING_DATASOURCE_PASSWORD`: `<cloud-db-password>`
-   - `APP_FRONTEND_URL`: `https://<your-frontend-domain>.vercel.app`
-   - `APP_CORS_ALLOWED_ORIGINS`: `https://<your-frontend-domain>.vercel.app`
+   - `APP_FRONTEND_URL`: `https://suruthideivendhiran0109.github.io/user-registration-login-system`
+   - `APP_CORS_ALLOWED_ORIGINS`: `https://suruthideivendhiran0109.github.io`
    - `SESSION_COOKIE_SECURE`: `true`
    - `SESSION_COOKIE_SAME_SITE`: `None`
-   - `SPRING_MAIL_HOST`: `smtp.gmail.com`
-   - `SPRING_MAIL_PORT`: `587`
-   - `SPRING_MAIL_USERNAME`: `<your-gmail-address>`
-   - `SPRING_MAIL_PASSWORD`: `<your-gmail-app-password>`
-   - `SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH`: `true`
-   - `SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE`: `true`
 
-### C. React Frontend (e.g. Vercel, Netlify)
-1. Deploy the `frontend/` directory to [Vercel](https://vercel.com/) or Netlify.
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-2. Configure Environment Variable:
-   - `VITE_API_URL`: `https://<your-backend-domain>.onrender.com/api`
-3. SPA routing redirects are pre-configured via `vercel.json` and `_redirects`.
+### C. React Frontend (GitHub Pages)
+1. The frontend automatically builds and deploys via GitHub Actions (`.github/workflows/deploy.yml`) on every push to `main`.
+2. Vite is configured with base path `/user-registration-login-system/`.
+3. SPA routing support on GitHub Pages is handled via `404.html` redirect script.
+4. Production API URL is injected via GitHub Secrets or `.env.production` (`VITE_API_URL=https://user-registration-backend-ny7r.onrender.com/api`).
